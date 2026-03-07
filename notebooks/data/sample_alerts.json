@@ -1,0 +1,72 @@
+[
+  {
+    "alert_id": "ALT-2025-001",
+    "timestamp": "2025-03-07T02:14:33Z",
+    "source": "Microsoft Sentinel",
+    "severity": "High",
+    "title": "Suspected Credential Stuffing from TOR Exit Node",
+    "description": "Multiple failed authentication attempts followed by a successful login from IP 185.220.101.47 (TOR exit node) against Azure AD tenant.",
+    "source_ip": "185.220.101.47",
+    "destination": "portal.azure.com",
+    "affected_users": ["jsmith@corp.com"],
+    "mitre_tactics": [],
+    "indicators": ["185.220.101.47"],
+    "raw_log": "Sign-in logs: 47 failed attempts + 1 success within 90 seconds from same IP"
+  },
+  {
+    "alert_id": "ALT-2025-002",
+    "timestamp": "2025-03-07T03:42:17Z",
+    "source": "Microsoft Defender XDR",
+    "severity": "Critical",
+    "title": "Cobalt Strike Beacon Detected",
+    "description": "Process hollowing detected in explorer.exe. C2 traffic to 194.165.16.101 on port 443 with suspicious certificate.",
+    "source_ip": "10.0.0.45",
+    "destination": "194.165.16.101",
+    "affected_users": ["CORP\\svc-backup"],
+    "mitre_tactics": [],
+    "indicators": ["194.165.16.101", "explorer.exe PID 4872"],
+    "raw_log": "ProcessEvent: explorer.exe spawned from svchost.exe (PID 1204), network connection to 194.165.16.101:443"
+  },
+  {
+    "alert_id": "ALT-2025-003",
+    "timestamp": "2025-03-07T06:11:55Z",
+    "source": "Microsoft Sentinel",
+    "severity": "Medium",
+    "title": "Anomalous Azure Key Vault Access",
+    "description": "Service principal 'app-prod-01' accessed 38 secrets in Key Vault within 5 minutes - abnormal access pattern.",
+    "source_ip": "20.112.52.29",
+    "destination": "prod-keyvault.vault.azure.net",
+    "affected_users": ["app-prod-01 (Service Principal)"],
+    "mitre_tactics": [],
+    "indicators": ["app-prod-01", "20.112.52.29"],
+    "raw_log": "AuditEvent: SecretGet x38 by app-prod-01 in 285 seconds"
+  },
+  {
+    "alert_id": "ALT-2025-004",
+    "timestamp": "2025-03-07T09:27:01Z",
+    "source": "Microsoft Defender for Cloud",
+    "severity": "High",
+    "title": "Fileless Malware: PowerShell Script in Memory",
+    "description": "Base64-encoded PowerShell detected running entirely in memory on WS-FINANCE-04. Possible living-off-the-land attack.",
+    "source_ip": "10.0.10.204",
+    "destination": "N/A",
+    "affected_users": ["CORP\\mwilson"],
+    "mitre_tactics": [],
+    "indicators": ["WS-FINANCE-04", "powershell.exe -EncodedCommand"],
+    "raw_log": "DeviceProcessEvents: powershell.exe -NonInteractive -NoProfile -EncodedCommand <4096 char base64>"
+  },
+  {
+    "alert_id": "ALT-2025-005",
+    "timestamp": "2025-03-07T11:55:30Z",
+    "source": "Microsoft Sentinel",
+    "severity": "Low",
+    "title": "Impossible Travel Detected",
+    "description": "User tchen@corp.com authenticated from Singapore at 11:50 UTC and from London at 11:55 UTC - 5 minutes apart.",
+    "source_ip": "103.25.206.88",
+    "destination": "login.microsoftonline.com",
+    "affected_users": ["tchen@corp.com"],
+    "mitre_tactics": [],
+    "indicators": ["103.25.206.88"],
+    "raw_log": "SignInLogs: Two successful auths from SIN and LON within 5 minutes"
+  }
+]
