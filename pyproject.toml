@@ -5,10 +5,16 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "agent-framework-azure-ai==1.0.0rc3",
+    "agent-framework-core==1.0.0rc3",
+    "agent-framework-orchestrations==1.0.0b260304",
+    "azure-ai-agents==1.2.0b5",
     "azure-ai-evaluation>=1.15.3",
-    "azure-ai-projects>=2.0.0",
+    "azure-ai-inference>=1.0.0b9",
+    "azure-ai-projects>=2.0.0b4,<2.1.0",
     "azure-identity>=1.25.2",
     "matplotlib>=3.10.8",
+    "nest-asyncio>=1.6.0",
     "pandas>=2.3.3",
     "python-dotenv>=1.2.2",
     "seaborn>=0.13.2",
@@ -19,3 +25,8 @@ dev = [
     "ipykernel>=6.29.0",
     "jupyter>=1.1.0",
 ]
+
+[tool.uv]
+# Agent Framework + Azure AI packages are pre-release; uv resolves them
+# because the version specifiers contain pre-release markers.
+prerelease = "if-necessary-or-explicit"

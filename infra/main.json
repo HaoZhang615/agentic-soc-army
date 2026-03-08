@@ -1,0 +1,313 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.40.2.10011",
+      "templateHash": "16716790594312834603"
+    }
+  },
+  "parameters": {
+    "resourceBaseName": {
+      "type": "string",
+      "metadata": {
+        "description": "Base name used to derive all resource names (lowercase, no spaces)."
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Azure region for all resources."
+      }
+    },
+    "projectName": {
+      "type": "string",
+      "defaultValue": "agentic-soc",
+      "metadata": {
+        "description": "Name of the AI Foundry project."
+      }
+    },
+    "modelName": {
+      "type": "string",
+      "defaultValue": "gpt-4.1",
+      "metadata": {
+        "description": "OpenAI model to deploy."
+      }
+    },
+    "modelVersion": {
+      "type": "string",
+      "defaultValue": "2025-04-14",
+      "metadata": {
+        "description": "Model version (region-dependent; check availability)."
+      }
+    },
+    "modelSkuName": {
+      "type": "string",
+      "defaultValue": "GlobalStandard",
+      "metadata": {
+        "description": "Deployment SKU name."
+      }
+    },
+    "modelCapacity": {
+      "type": "int",
+      "defaultValue": 30,
+      "metadata": {
+        "description": "Deployment capacity in thousands of tokens per minute."
+      }
+    },
+    "deploySearch": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Deploy Azure AI Search and create a Foundry connection (for Notebook 04)."
+      }
+    },
+    "searchSku": {
+      "type": "string",
+      "defaultValue": "basic",
+      "allowedValues": [
+        "free",
+        "basic",
+        "standard",
+        "standard2",
+        "standard3"
+      ],
+      "metadata": {
+        "description": "Azure AI Search SKU."
+      }
+    },
+    "deployMonitoring": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Deploy Log Analytics + Application Insights (for Notebook 05)."
+      }
+    },
+    "userPrincipalId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Object ID of the user or service principal to grant Azure AI Developer role. Leave empty to skip."
+      }
+    },
+    "userPrincipalType": {
+      "type": "string",
+      "defaultValue": "User",
+      "allowedValues": [
+        "User",
+        "ServicePrincipal",
+        "Group"
+      ],
+      "metadata": {
+        "description": "Principal type for the role assignment."
+      }
+    }
+  },
+  "variables": {
+    "uniqueSuffix": "[uniqueString(resourceGroup().id, parameters('resourceBaseName'))]",
+    "accountName": "[format('{0}-{1}', parameters('resourceBaseName'), variables('uniqueSuffix'))]",
+    "searchName": "[format('{0}-search-{1}', parameters('resourceBaseName'), variables('uniqueSuffix'))]",
+    "searchConnectionName": "[format('{0}-connection', variables('searchName'))]",
+    "logAnalyticsName": "[format('{0}-logs-{1}', parameters('resourceBaseName'), variables('uniqueSuffix'))]",
+    "appInsightsName": "[format('{0}-appins-{1}', parameters('resourceBaseName'), variables('uniqueSuffix'))]",
+    "deploymentName": "[parameters('modelName')]",
+    "azureAiDeveloperRoleId": "64702f94-c441-49e6-a78b-ef80e0188fee",
+    "searchIndexDataReaderRoleId": "1407120a-92aa-4202-b7e9-c0e197c71c8f"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.CognitiveServices/accounts",
+      "apiVersion": "2025-06-01",
+      "name": "[variables('accountName')]",
+      "location": "[parameters('location')]",
+      "kind": "AIServices",
+      "sku": {
+        "name": "S0"
+      },
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "customSubDomainName": "[variables('accountName')]",
+        "allowProjectManagement": true,
+        "publicNetworkAccess": "Enabled",
+        "disableLocalAuth": false
+      }
+    },
+    {
+      "type": "Microsoft.CognitiveServices/accounts/projects",
+      "apiVersion": "2025-06-01",
+      "name": "[format('{0}/{1}', variables('accountName'), parameters('projectName'))]",
+      "location": "[parameters('location')]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "displayName": "Agentic SOC Army",
+        "description": "Multi-agent SOC workflow notebooks"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.CognitiveServices/accounts', variables('accountName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.CognitiveServices/accounts/deployments",
+      "apiVersion": "2025-06-01",
+      "name": "[format('{0}/{1}', variables('accountName'), variables('deploymentName'))]",
+      "sku": {
+        "name": "[parameters('modelSkuName')]",
+        "capacity": "[parameters('modelCapacity')]"
+      },
+      "properties": {
+        "model": {
+          "format": "OpenAI",
+          "name": "[parameters('modelName')]",
+          "version": "[parameters('modelVersion')]"
+        },
+        "versionUpgradeOption": "OnceNewDefaultVersionAvailable",
+        "raiPolicyName": "Microsoft.Default"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.CognitiveServices/accounts', variables('accountName'))]"
+      ]
+    },
+    {
+      "condition": "[parameters('deploySearch')]",
+      "type": "Microsoft.Search/searchServices",
+      "apiVersion": "2024-06-01-preview",
+      "name": "[variables('searchName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[parameters('searchSku')]"
+      },
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "replicaCount": 1,
+        "partitionCount": 1,
+        "hostingMode": "default",
+        "publicNetworkAccess": "enabled"
+      }
+    },
+    {
+      "condition": "[parameters('deploySearch')]",
+      "type": "Microsoft.CognitiveServices/accounts/connections",
+      "apiVersion": "2025-06-01",
+      "name": "[format('{0}/{1}', variables('accountName'), variables('searchConnectionName'))]",
+      "properties": {
+        "category": "CognitiveSearch",
+        "target": "[if(parameters('deploySearch'), format('https://{0}.search.windows.net', variables('searchName')), '')]",
+        "authType": "AAD",
+        "isSharedToAll": true,
+        "metadata": {
+          "ApiType": "Azure",
+          "ResourceId": "[if(parameters('deploySearch'), resourceId('Microsoft.Search/searchServices', variables('searchName')), '')]",
+          "location": "[parameters('location')]"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.CognitiveServices/accounts', variables('accountName'))]",
+        "[resourceId('Microsoft.Search/searchServices', variables('searchName'))]"
+      ]
+    },
+    {
+      "condition": "[parameters('deploySearch')]",
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "scope": "[resourceId('Microsoft.Search/searchServices', variables('searchName'))]",
+      "name": "[guid(resourceId('Microsoft.Search/searchServices', variables('searchName')), resourceId('Microsoft.CognitiveServices/accounts', variables('accountName')), variables('searchIndexDataReaderRoleId'))]",
+      "properties": {
+        "principalId": "[reference(resourceId('Microsoft.CognitiveServices/accounts', variables('accountName')), '2025-06-01', 'full').identity.principalId]",
+        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', variables('searchIndexDataReaderRoleId'))]",
+        "principalType": "ServicePrincipal"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.CognitiveServices/accounts', variables('accountName'))]",
+        "[resourceId('Microsoft.Search/searchServices', variables('searchName'))]"
+      ]
+    },
+    {
+      "condition": "[parameters('deployMonitoring')]",
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "apiVersion": "2023-09-01",
+      "name": "[variables('logAnalyticsName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "sku": {
+          "name": "PerGB2018"
+        },
+        "retentionInDays": 30
+      }
+    },
+    {
+      "condition": "[parameters('deployMonitoring')]",
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2020-02-02",
+      "name": "[variables('appInsightsName')]",
+      "location": "[parameters('location')]",
+      "kind": "web",
+      "properties": {
+        "Application_Type": "web",
+        "WorkspaceResourceId": "[if(parameters('deployMonitoring'), resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsName')), '')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsName'))]"
+      ]
+    },
+    {
+      "condition": "[not(empty(parameters('userPrincipalId')))]",
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "scope": "[resourceId('Microsoft.CognitiveServices/accounts', variables('accountName'))]",
+      "name": "[guid(resourceId('Microsoft.CognitiveServices/accounts', variables('accountName')), parameters('userPrincipalId'), variables('azureAiDeveloperRoleId'))]",
+      "properties": {
+        "principalId": "[parameters('userPrincipalId')]",
+        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', variables('azureAiDeveloperRoleId'))]",
+        "principalType": "[parameters('userPrincipalType')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.CognitiveServices/accounts', variables('accountName'))]"
+      ]
+    }
+  ],
+  "outputs": {
+    "AZURE_AI_PROJECT_ENDPOINT": {
+      "type": "string",
+      "metadata": {
+        "description": "AZURE_AI_PROJECT_ENDPOINT — used by all notebooks"
+      },
+      "value": "[format('https://{0}.services.ai.azure.com/api/projects/{1}', reference(resourceId('Microsoft.CognitiveServices/accounts', variables('accountName')), '2025-06-01').customSubDomainName, parameters('projectName'))]"
+    },
+    "MODEL_DEPLOYMENT_NAME": {
+      "type": "string",
+      "metadata": {
+        "description": "MODEL_DEPLOYMENT_NAME — used by all notebooks"
+      },
+      "value": "[variables('deploymentName')]"
+    },
+    "AZURE_AI_SEARCH_CONNECTION_NAME": {
+      "type": "string",
+      "metadata": {
+        "description": "AZURE_AI_SEARCH_CONNECTION_NAME — used by Notebook 04 (empty if search not deployed)"
+      },
+      "value": "[if(parameters('deploySearch'), variables('searchConnectionName'), '')]"
+    },
+    "AZURE_AI_SEARCH_INDEX_NAME": {
+      "type": "string",
+      "metadata": {
+        "description": "AZURE_AI_SEARCH_INDEX_NAME — the index itself is created at query time; this is a suggested default"
+      },
+      "value": "soc-threat-intel"
+    },
+    "APPLICATIONINSIGHTS_CONNECTION_STRING": {
+      "type": "string",
+      "metadata": {
+        "description": "APPLICATIONINSIGHTS_CONNECTION_STRING — used by Notebook 05 (empty if monitoring not deployed)"
+      },
+      "value": "[if(parameters('deployMonitoring'), reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2020-02-02').ConnectionString, '')]"
+    }
+  }
+}

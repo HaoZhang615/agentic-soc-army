@@ -1,6 +1,6 @@
 # 🛡️ Agentic SOC Army
 
-A hands-on notebook series for building a **multi-agent Security Operations Center (SOC) workflow** using **Microsoft Foundry Agent Service** and the **Azure AI Agents SDK**.
+A hands-on notebook series for building a **multi-agent Security Operations Center (SOC) workflow** using the **Microsoft Agent Framework**, **Azure AI Foundry Agent Service**, and the **Azure AI Agents SDK**.
 
 Each notebook is self-contained with a `MOCK_MODE` — cells marked 🔵 run without Azure credentials, cells marked 🔴 require a connected Foundry project.
 
@@ -10,7 +10,7 @@ Each notebook is self-contained with a `MOCK_MODE` — cells marked 🔵 run wit
 
 | # | Notebook | Topic | Key SDK |
 |---|----------|-------|---------|
-| 01 | [Multi-Agent SOC Architecture](notebooks/01_multi_agent_soc_architecture.ipynb) | Router-Worker pattern, Python-orchestrated multi-agent delegation | `AIProjectClient`, `responses.create()`, `PromptAgentDefinition` |
+| 01 | [Multi-Agent SOC Architecture](notebooks/01_multi_agent_soc_architecture.ipynb) | True Router-Worker pattern via Agent Framework `GroupChatBuilder` | `GroupChatBuilder`, `AzureAIProjectAgentProvider`, `@tool` |
 | 02 | [Advanced Tooling & MCP](notebooks/02_advanced_tooling_mcp.ipynb) | `FunctionTool`, `MCPTool`, `OpenApiTool` deep dive | `FunctionTool`, `MCPTool`, `OpenApiTool` |
 | 03 | [State & Memory Management](notebooks/03_state_memory_management.ipynb) | Conversation persistence, shift handoff, long-term memory store | Conversation IDs, context injection |
 | 04 | [Knowledge Bases & RAG](notebooks/04_knowledge_bases_rag.ipynb) | Vector stores, `FileSearchTool`, `AzureAISearchTool` | `FileSearchTool`, `AzureAISearchTool` |
@@ -21,22 +21,21 @@ Each notebook is self-contained with a `MOCK_MODE` — cells marked 🔵 run wit
 ## 🏗️ Architecture
 
 ```
-                        ┌─────────────────────────────────┐
-                        │       SOC Orchestrator          │
-                        │  (ConnectedAgentTool router)    │
-                        └───────┬──────────┬──────────────┘
-                                │          │
-               ┌────────────────┘          └────────────────┐
-               ▼                                            ▼
-  ┌────────────────────────┐              ┌────────────────────────────┐
-  │  Threat Intel Agent    │              │  Alert Enrichment Agent    │
-  │  FunctionTool:         │              │  FunctionTool:             │
-  │  - lookup_ioc          │              │  - query_siem              │
-  │  - map_to_mitre        │              │  - get_playbook            │
-  └────────────────────────┘              └────────────────────────────┘
-               │                                            │
-               └──────────► RAG Knowledge Base ◄───────────┘
-                            (Playbooks, TI Docs)
+                  ┌──────────────────────────────────────┐
+                  │         SOC Router Agent             │
+                  │  (GroupChatBuilder orchestrator)     │
+                  └──────┬──────────┬──────────┬────────┘
+                         │          │          │
+            ┌────────────┘          │          └──────────────┐
+            ▼                       ▼                         ▼
+  ┌──────────────────┐  ┌────────────────────┐  ┌──────────────────┐
+  │ Threat Intel      │  │ Alert Enrichment   │  │ SOC Reporter     │
+  │ Worker            │  │ Worker             │  │                  │
+  │ @tool:            │  │ @tool:             │  │ Synthesises      │
+  │ - lookup_ioc      │  │ - query_siem       │  │ findings into    │
+  │ - siem_query      │  │ - mitre_map        │  │ final triage     │
+  └──────────────────┘  │ - get_playbook      │  │ report           │
+                        └────────────────────┘  └──────────────────┘
 ```
 
 ---
@@ -45,9 +44,10 @@ Each notebook is self-contained with a `MOCK_MODE` — cells marked 🔵 run wit
 
 ### Prerequisites
 
-- Python 3.10+
+- Python 3.13+
 - [uv](https://docs.astral.sh/uv/getting-started/installation/) — fast Python package manager
-- An [Azure AI Foundry](https://ai.azure.com) project with a deployed GPT-4o model
+- [Azure Developer CLI (`azd`)](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd) — for one-command infrastructure provisioning
+- An Azure subscription with permission to create resources
 - (Optional) Azure AI Search index for enterprise RAG
 
 ### 1. Clone & Install
@@ -58,20 +58,36 @@ cd agentic-soc-army
 uv sync                        # installs all dependencies from uv.lock
 ```
 
-### 2. Configure `.env`
+### 2. Provision Azure Infrastructure
+
+The repo uses [Azure Developer CLI (`azd`)](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd) for one-command provisioning.
 
 ```bash
+azd auth login
+azd up            # provisions Foundry account + project + GPT-4.1 model
+```
+
+`azd up` will prompt for a subscription and location, deploy the Bicep infrastructure, and auto-populate your `.env` file via a postprovision hook.
+
+**Optional resources** — edit `infra/main.bicepparam` before deploying:
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `deploySearch` | `false` | Set `true` to provision Azure AI Search + Foundry connection (Notebook 04) |
+| `deployMonitoring` | `false` | Set `true` to provision Application Insights + Log Analytics (Notebook 05) |
+| `userPrincipalId` | `''` | Your AAD object ID — grants Azure AI Developer role (`az ad signed-in-user show --query id -o tsv`) |
+
+### 3. Configure `.env`
+
+If you used `azd up`, the `.env` file is auto-populated by the postprovision hook — **no manual step needed.**
+
+To configure manually instead:
+```bash
 cp .env.example .env
-# Edit .env with your Azure project details
+# Fill in values from the Azure portal or azd env get-values
 ```
 
-Required:
-```
-AZURE_AI_PROJECT_ENDPOINT=https://<account>.services.ai.azure.com/api/projects/<project>
-MODEL_DEPLOYMENT_NAME=gpt-4o
-```
-
-### 3. Run Notebooks
+### 4. Run Notebooks
 
 Open in VS Code or Jupyter:
 ```bash
@@ -86,6 +102,12 @@ Start with `01_multi_agent_soc_architecture.ipynb` — it works in MOCK_MODE wit
 
 ```
 agentic-soc-army/
+├── azure.yaml                  ← azd manifest (infra-only, postprovision hooks)
+├── infra/
+│   ├── main.bicep              ← Azure infrastructure (Foundry, Search, AppInsights)
+│   ├── main.bicepparam         ← Deployment parameters
+│   ├── postprovision.sh        ← Auto-populates .env on Linux/macOS
+│   └── postprovision.ps1       ← Auto-populates .env on Windows
 ├── notebooks/
 │   ├── 01_multi_agent_soc_architecture.ipynb
 │   ├── 02_advanced_tooling_mcp.ipynb
@@ -97,6 +119,7 @@ agentic-soc-army/
 │       ├── ir_playbook_credential_attack.md  ← IR runbook for RAG
 │       └── threat_intel_reference.md   ← TI reference for RAG
 ├── .env.example
+├── pyproject.toml              ← Dependencies (uv sync)
 └── .github/
     └── agents/
         └── notebook-builder.agent.md  ← Custom VS Code Copilot agent
@@ -108,6 +131,9 @@ agentic-soc-army/
 
 | Concept | Description |
 |---------|-------------|
+| **GroupChatBuilder** | Agent Framework orchestration — LLM-driven router selects which worker agents to invoke per turn |
+| **AzureAIProjectAgentProvider** | Creates Foundry-backed agents from within the Agent Framework |
+| **@tool decorator** | Agent Framework decorator that infers JSON Schema from `Annotated` function signatures |
 | **Conversation** | Persistent multi-turn context — `conversation.id` survives across Python sessions |
 | **Responses API** | `openai_client.responses.create()` — single call replaces threads + runs |
 | **FunctionTool** | Python functions exposed as agent tools — explicit JSON Schema, manual `FunctionCallOutput` loop |

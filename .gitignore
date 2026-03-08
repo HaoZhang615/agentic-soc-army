@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Virtual environment
+.venv/
+
+# Environment variables (secrets)
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+*_test_output.ipynb
+
+# OS
+.DS_Store
+Thumbs.db
+nul
+
+# Windows shell artifacts
+%TEMP%/
+
+# IDE
+.vscode/
+.idea/
+
+# Azure
+.azure/
