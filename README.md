@@ -2,7 +2,7 @@
 
 A hands-on notebook series for building a **multi-agent Security Operations Center (SOC) workflow** using the **Microsoft Agent Framework**, **Azure AI Foundry Agent Service**, and the **Azure AI Agents SDK**.
 
-Each notebook is self-contained with a `MOCK_MODE` — cells marked 🔵 run without Azure credentials, cells marked 🔴 require a connected Foundry project.
+Each notebook requires a deployed Azure AI Foundry project. Run `azd up` to provision infrastructure before running notebooks.
 
 ---
 
@@ -22,8 +22,9 @@ Each notebook is self-contained with a `MOCK_MODE` — cells marked 🔵 run wit
 
 ```
                   ┌──────────────────────────────────────┐
-                  │         SOC Router Agent             │
-                  │  (GroupChatBuilder orchestrator)     │
+                  │     SOC Router (selection_func)     │
+                  │  (Deterministic routing via         │
+                  │   GroupChatBuilder)                 │
                   └──────┬──────────┬──────────┬────────┘
                          │          │          │
             ┌────────────┘          │          └──────────────┐
@@ -94,7 +95,7 @@ Open in VS Code or Jupyter:
 uv run jupyter notebook notebooks/
 ```
 
-Start with `01_multi_agent_soc_architecture.ipynb` — it works in MOCK_MODE without credentials.
+Start with `01_multi_agent_soc_architecture.ipynb` — requires a deployed Azure AI Foundry project (`azd up`).
 
 ---
 
@@ -131,7 +132,7 @@ agentic-soc-army/
 
 | Concept | Description |
 |---------|-------------|
-| **GroupChatBuilder** | Agent Framework orchestration — LLM-driven router selects which worker agents to invoke per turn |
+| **GroupChatBuilder** | Agent Framework orchestration — deterministic `selection_func` routes worker agents based on alert severity and IOC presence |
 | **AzureOpenAIResponsesClient** | Stateless Azure OpenAI Responses API client — supports runtime tool injection and structured output, used by `GroupChatBuilder` for dynamic speaker selection |
 | **@tool decorator** | Agent Framework decorator that infers JSON Schema from `Annotated` function signatures |
 | **Conversation** | Persistent multi-turn context — `conversation.id` survives across Python sessions |
