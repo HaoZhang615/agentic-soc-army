@@ -10,7 +10,7 @@ Each notebook is self-contained with a `MOCK_MODE` — cells marked 🔵 run wit
 
 | # | Notebook | Topic | Key SDK |
 |---|----------|-------|---------|
-| 01 | [Multi-Agent SOC Architecture](notebooks/01_multi_agent_soc_architecture.ipynb) | True Router-Worker pattern via Agent Framework `GroupChatBuilder` | `GroupChatBuilder`, `AzureAIProjectAgentProvider`, `@tool` |
+| 01 | [Multi-Agent SOC Architecture](notebooks/01_multi_agent_soc_architecture.ipynb) | True Router-Worker pattern via Agent Framework `GroupChatBuilder` | `GroupChatBuilder`, `AzureOpenAIResponsesClient`, `@tool` |
 | 02 | [Advanced Tooling & MCP](notebooks/02_advanced_tooling_mcp.ipynb) | `FunctionTool`, `MCPTool`, `OpenApiTool` deep dive | `FunctionTool`, `MCPTool`, `OpenApiTool` |
 | 03 | [State & Memory Management](notebooks/03_state_memory_management.ipynb) | Conversation persistence, shift handoff, long-term memory store | Conversation IDs, context injection |
 | 04 | [Knowledge Bases & RAG](notebooks/04_knowledge_bases_rag.ipynb) | Vector stores, `FileSearchTool`, `AzureAISearchTool` | `FileSearchTool`, `AzureAISearchTool` |
@@ -132,7 +132,7 @@ agentic-soc-army/
 | Concept | Description |
 |---------|-------------|
 | **GroupChatBuilder** | Agent Framework orchestration — LLM-driven router selects which worker agents to invoke per turn |
-| **AzureAIProjectAgentProvider** | Creates Foundry-backed agents from within the Agent Framework |
+| **AzureOpenAIResponsesClient** | Stateless Azure OpenAI Responses API client — supports runtime tool injection and structured output, used by `GroupChatBuilder` for dynamic speaker selection |
 | **@tool decorator** | Agent Framework decorator that infers JSON Schema from `Annotated` function signatures |
 | **Conversation** | Persistent multi-turn context — `conversation.id` survives across Python sessions |
 | **Responses API** | `openai_client.responses.create()` — single call replaces threads + runs |
