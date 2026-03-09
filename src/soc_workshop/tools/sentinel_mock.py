@@ -1,6 +1,6 @@
 """Mock Sentinel / Defender enrichment functions.
 
-Each function doubles as an Azure AI Agent *FunctionTool* callable AND
+Each function doubles as an Foundry Agent *FunctionTool* callable AND
 returns realistic canned data when SOC_WORKSHOP_OFFLINE=1.
 """
 
