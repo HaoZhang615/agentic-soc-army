@@ -1,0 +1,74 @@
+[
+  {
+    "timestamp": "2025-03-07T14:32:15Z",
+    "host": "WKS-FIN-PC04",
+    "process": "powershell.exe",
+    "remote_ip": "198.51.100.23",
+    "remote_port": 8080,
+    "protocol": "HTTP",
+    "direction": "Outbound",
+    "bytes_sent": 256,
+    "bytes_received": 48200,
+    "action": "Allowed"
+  },
+  {
+    "timestamp": "2025-03-07T14:33:10Z",
+    "host": "WKS-FIN-PC04",
+    "process": "beacon.exe",
+    "remote_ip": "198.51.100.23",
+    "remote_port": 443,
+    "protocol": "HTTPS",
+    "direction": "Outbound",
+    "bytes_sent": 1024,
+    "bytes_received": 2048,
+    "action": "Allowed"
+  },
+  {
+    "timestamp": "2025-03-07T14:35:00Z",
+    "host": "WKS-FIN-PC04",
+    "process": "beacon.exe",
+    "remote_ip": "198.51.100.23",
+    "remote_port": 443,
+    "protocol": "HTTPS",
+    "direction": "Outbound",
+    "bytes_sent": 512,
+    "bytes_received": 4096,
+    "action": "Allowed"
+  },
+  {
+    "timestamp": "2025-03-07T14:44:00Z",
+    "host": "WKS-FIN-PC04",
+    "process": "rclone.exe",
+    "remote_ip": "89.44.9.100",
+    "remote_port": 443,
+    "protocol": "HTTPS",
+    "direction": "Outbound",
+    "bytes_sent": 2470000000,
+    "bytes_received": 45000,
+    "action": "Allowed"
+  },
+  {
+    "timestamp": "2025-03-07T14:50:20Z",
+    "host": "WKS-FIN-PC04",
+    "process": "psexec.exe",
+    "remote_ip": "10.0.1.10",
+    "remote_port": 445,
+    "protocol": "SMB",
+    "direction": "Outbound",
+    "bytes_sent": 8192,
+    "bytes_received": 4096,
+    "action": "Allowed"
+  },
+  {
+    "timestamp": "2025-03-07T14:58:05Z",
+    "host": "WKS-FIN-PC04",
+    "process": "locker.exe",
+    "remote_ip": "10.0.2.20",
+    "remote_port": 445,
+    "protocol": "SMB",
+    "direction": "Outbound",
+    "bytes_sent": 1560000,
+    "bytes_received": 780000,
+    "action": "Allowed"
+  }
+]

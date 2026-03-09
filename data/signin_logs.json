@@ -1,0 +1,74 @@
+[
+  {
+    "user_principal": "jdoe@contoso.com",
+    "timestamp": "2025-03-07T03:18:45Z",
+    "ip_address": "185.220.101.42",
+    "location": "Unknown (TOR exit node)",
+    "device": "Unknown device",
+    "device_compliant": false,
+    "mfa_satisfied": false,
+    "risk_level": "High",
+    "status": "Success",
+    "app": "Microsoft 365 Portal"
+  },
+  {
+    "user_principal": "jdoe@contoso.com",
+    "timestamp": "2025-03-07T08:22:10Z",
+    "ip_address": "10.0.14.88",
+    "location": "Seattle, WA",
+    "device": "WKS-FIN-PC04",
+    "device_compliant": true,
+    "mfa_satisfied": true,
+    "risk_level": "None",
+    "status": "Success",
+    "app": "Microsoft 365 Portal"
+  },
+  {
+    "user_principal": "jdoe@contoso.com",
+    "timestamp": "2025-03-06T17:45:00Z",
+    "ip_address": "10.0.14.88",
+    "location": "Seattle, WA",
+    "device": "WKS-FIN-PC04",
+    "device_compliant": true,
+    "mfa_satisfied": true,
+    "risk_level": "None",
+    "status": "Success",
+    "app": "SharePoint Online"
+  },
+  {
+    "user_principal": "jdoe@contoso.com",
+    "timestamp": "2025-03-07T09:50:12Z",
+    "ip_address": "203.0.113.77",
+    "location": "Lagos, Nigeria",
+    "device": "Unknown device",
+    "device_compliant": false,
+    "mfa_satisfied": false,
+    "risk_level": "High",
+    "status": "Failure",
+    "app": "Azure Portal"
+  },
+  {
+    "user_principal": "admin-svc@contoso.com",
+    "timestamp": "2025-03-07T14:52:00Z",
+    "ip_address": "10.0.14.88",
+    "location": "Seattle, WA (internal)",
+    "device": "WKS-FIN-PC04",
+    "device_compliant": true,
+    "mfa_satisfied": false,
+    "risk_level": "Medium",
+    "status": "Success",
+    "app": "Windows Logon"
+  },
+  {
+    "user_principal": "asmith@contoso.com",
+    "timestamp": "2025-03-07T08:00:00Z",
+    "ip_address": "10.0.12.55",
+    "location": "Seattle, WA",
+    "device": "WKS-IT-PC01",
+    "device_compliant": true,
+    "mfa_satisfied": true,
+    "risk_level": "None",
+    "status": "Success",
+    "app": "Microsoft 365 Portal"
+  }
+]

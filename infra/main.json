@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.40.2.10011",
-      "templateHash": "16716790594312834603"
+      "templateHash": "7253215397950667754"
     }
   },
   "parameters": {
@@ -112,6 +112,7 @@
     "searchConnectionName": "[format('{0}-connection', variables('searchName'))]",
     "logAnalyticsName": "[format('{0}-logs-{1}', parameters('resourceBaseName'), variables('uniqueSuffix'))]",
     "appInsightsName": "[format('{0}-appins-{1}', parameters('resourceBaseName'), variables('uniqueSuffix'))]",
+    "appInsightsConnectionName": "[format('appins-{0}', variables('uniqueSuffix'))]",
     "deploymentName": "[parameters('modelName')]",
     "azureAiDeveloperRoleId": "64702f94-c441-49e6-a78b-ef80e0188fee",
     "searchIndexDataReaderRoleId": "1407120a-92aa-4202-b7e9-c0e197c71c8f"
@@ -255,6 +256,30 @@
       },
       "dependsOn": [
         "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsName'))]"
+      ]
+    },
+    {
+      "condition": "[parameters('deployMonitoring')]",
+      "type": "Microsoft.CognitiveServices/accounts/projects/connections",
+      "apiVersion": "2025-06-01",
+      "name": "[format('{0}/{1}/{2}', variables('accountName'), parameters('projectName'), variables('appInsightsConnectionName'))]",
+      "properties": {
+        "category": "AppInsights",
+        "target": "[if(parameters('deployMonitoring'), resourceId('Microsoft.Insights/components', variables('appInsightsName')), '')]",
+        "authType": "ApiKey",
+        "isSharedToAll": true,
+        "credentials": {
+          "key": "[if(parameters('deployMonitoring'), reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2020-02-02').InstrumentationKey, '')]"
+        },
+        "metadata": {
+          "ApiType": "Azure",
+          "ResourceId": "[if(parameters('deployMonitoring'), resourceId('Microsoft.Insights/components', variables('appInsightsName')), '')]",
+          "location": "[parameters('location')]"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]",
+        "[resourceId('Microsoft.CognitiveServices/accounts/projects', variables('accountName'), parameters('projectName'))]"
       ]
     },
     {

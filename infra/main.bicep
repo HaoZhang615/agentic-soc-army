@@ -39,14 +39,14 @@ param modelSkuName string = 'GlobalStandard'
 @description('Deployment capacity in thousands of tokens per minute.')
 param modelCapacity int = 30
 
-@description('Deploy Azure AI Search and create a Foundry connection (for Notebook 04).')
+@description('Deploy Azure AI Search and create a Foundry connection (for Notebook 02).')
 param deploySearch bool = false
 
 @description('Azure AI Search SKU.')
 @allowed(['free', 'basic', 'standard', 'standard2', 'standard3'])
 param searchSku string = 'basic'
 
-@description('Deploy Log Analytics + Application Insights (for Notebook 05).')
+@description('Deploy Log Analytics + Application Insights (enables tracing for all notebooks).')
 param deployMonitoring bool = false
 
 @description('Object ID of the user or service principal to grant Azure AI Developer role. Leave empty to skip.')
@@ -64,6 +64,7 @@ var searchName = '${resourceBaseName}-search-${uniqueSuffix}'
 var searchConnectionName = '${searchName}-connection'
 var logAnalyticsName = '${resourceBaseName}-logs-${uniqueSuffix}'
 var appInsightsName = '${resourceBaseName}-appins-${uniqueSuffix}'
+var appInsightsConnectionName = 'appins-${uniqueSuffix}'
 var deploymentName = modelName // match MODEL_DEPLOYMENT_NAME expected by notebooks
 
 // Built-in role definition IDs
@@ -195,6 +196,26 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = if (deployMoni
   }
 }
 
+// Foundry Project → Application Insights connection (enables agent tracing)
+resource appInsightsConnection 'Microsoft.CognitiveServices/accounts/projects/connections@2025-06-01' = if (deployMonitoring) {
+  parent: project
+  name: appInsightsConnectionName
+  properties: {
+    category: 'AppInsights'
+    target: deployMonitoring ? appInsights.id : ''
+    authType: 'ApiKey'
+    isSharedToAll: true
+    credentials: {
+      key: deployMonitoring ? appInsights!.properties.InstrumentationKey : ''
+    }
+    metadata: {
+      ApiType: 'Azure'
+      ResourceId: deployMonitoring ? appInsights.id : ''
+      location: location
+    }
+  }
+}
+
 // ── Role Assignments (optional) ──────────────────────────────────────────────
 
 // Grant deploying user → Azure AI Developer on the Foundry account
@@ -223,5 +244,5 @@ output AZURE_AI_SEARCH_CONNECTION_NAME string = deploySearch ? searchConnection.
 @description('AZURE_AI_SEARCH_INDEX_NAME — the index itself is created at query time; this is a suggested default')
 output AZURE_AI_SEARCH_INDEX_NAME string = 'soc-threat-intel'
 
-@description('APPLICATIONINSIGHTS_CONNECTION_STRING — used by Notebook 05 (empty if monitoring not deployed)')
+@description('APPLICATIONINSIGHTS_CONNECTION_STRING — enables agent tracing across all notebooks (empty if monitoring not deployed)')
 output APPLICATIONINSIGHTS_CONNECTION_STRING string = deployMonitoring ? appInsights!.properties.ConnectionString : ''

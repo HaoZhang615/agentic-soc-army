@@ -1,0 +1,113 @@
+{
+  "ip:198.51.100.23": {
+    "entity_type": "ip",
+    "value": "198.51.100.23",
+    "risk_score": 92,
+    "risk_level": "Critical",
+    "tags": ["known-c2", "cobalt-strike", "threat-intel-match"],
+    "first_seen": "2025-02-15",
+    "last_seen": "2025-03-07",
+    "geo": "Eastern Europe"
+  },
+  "ip:185.220.101.42": {
+    "entity_type": "ip",
+    "value": "185.220.101.42",
+    "risk_score": 88,
+    "risk_level": "High",
+    "tags": ["tor-exit-node"],
+    "first_seen": "2024-11-01",
+    "last_seen": "2025-03-07",
+    "geo": "Germany (TOR)"
+  },
+  "ip:203.0.113.77": {
+    "entity_type": "ip",
+    "value": "203.0.113.77",
+    "risk_score": 65,
+    "risk_level": "Medium",
+    "tags": ["suspicious-geo", "brute-force-source"],
+    "first_seen": "2025-03-01",
+    "last_seen": "2025-03-07",
+    "geo": "Nigeria"
+  },
+  "user:jdoe@contoso.com": {
+    "entity_type": "user",
+    "value": "jdoe@contoso.com",
+    "risk_score": 70,
+    "risk_level": "High",
+    "tags": ["finance-team", "compromised-likely"],
+    "department": "Finance",
+    "title": "Senior Financial Analyst",
+    "manager": "mwilson@contoso.com"
+  },
+  "user:admin-svc@contoso.com": {
+    "entity_type": "user",
+    "value": "admin-svc@contoso.com",
+    "risk_score": 85,
+    "risk_level": "Critical",
+    "tags": ["service-account", "domain-admin", "credential-theft-suspect"],
+    "department": "IT",
+    "title": "Service Account"
+  },
+  "host:WKS-FIN-PC04": {
+    "entity_type": "host",
+    "value": "WKS-FIN-PC04",
+    "risk_score": 95,
+    "risk_level": "Critical",
+    "tags": ["finance-dept", "patient-zero", "active-compromise"],
+    "os": "Windows 11 Enterprise",
+    "last_user": "jdoe@contoso.com",
+    "ip": "10.0.14.88"
+  },
+  "host:DC01": {
+    "entity_type": "host",
+    "value": "DC01",
+    "risk_score": 99,
+    "risk_level": "Critical",
+    "tags": ["domain-controller", "lateral-movement-target"],
+    "os": "Windows Server 2022",
+    "role": "Primary Domain Controller"
+  },
+  "host:FILESRV01": {
+    "entity_type": "host",
+    "value": "FILESRV01",
+    "risk_score": 80,
+    "risk_level": "High",
+    "tags": ["file-server", "finance-share", "ransomware-impact"],
+    "os": "Windows Server 2022",
+    "shares": ["finance$", "shared$"]
+  },
+  "filehash:a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2": {
+    "entity_type": "filehash",
+    "value": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+    "risk_score": 95,
+    "risk_level": "Critical",
+    "tags": ["cobalt-strike-beacon", "malware"],
+    "malware_family": "Cobalt Strike",
+    "first_submission": "2025-02-20",
+    "detection_rate": "48/72"
+  },
+  "domain:contos0-login.evil.com": {
+    "entity_type": "domain",
+    "value": "contos0-login.evil.com",
+    "risk_score": 97,
+    "risk_level": "Critical",
+    "tags": ["phishing-domain", "credential-harvest", "typosquat"],
+    "registered": "2025-03-05",
+    "registrar": "NameCheap"
+  },
+  "url:https://contos0-login.evil.com/auth": {
+    "entity_type": "url",
+    "value": "https://contos0-login.evil.com/auth",
+    "risk_score": 98,
+    "risk_level": "Critical",
+    "tags": ["phishing", "credential-harvest", "active"]
+  },
+  "domain:mega.nz": {
+    "entity_type": "domain",
+    "value": "mega.nz",
+    "risk_score": 45,
+    "risk_level": "Medium",
+    "tags": ["cloud-storage", "exfil-vector"],
+    "note": "Legitimate service frequently abused for data exfiltration"
+  }
+}

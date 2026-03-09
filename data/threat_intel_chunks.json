@@ -1,0 +1,47 @@
+[
+  {
+    "id": "TI-001",
+    "title": "Cobalt Strike Beacon Indicators of Compromise",
+    "source": "CISA Advisory AA25-042A",
+    "content": "Cobalt Strike is a commercial adversary simulation tool frequently abused by threat actors. Beacon payloads communicate via HTTPS to command-and-control servers, typically on ports 443 or 8080. Common indicators include: encoded PowerShell downloaders using IEX(New-Object Net.WebClient).DownloadString(), process injection into legitimate Windows processes (svchost.exe, rundll32.exe), named pipes matching \\\\\\\\\\\\pipe\\\\msagent_*, and sleep jitter patterns of 30-60 seconds. File hashes for known Cobalt Strike loaders circulating in Q1 2025: SHA256 a1b2c3d4e5f6... (truncated). Network signatures include JA3 hash e7d705a3286e19ea42f587b344ee6865 and HTTP malleable C2 profiles masquerading as jQuery or Amazon CDN traffic. Recommended actions: block known C2 IPs at perimeter, hunt for beacon process lineage (explorer.exe → powershell.exe → beacon.exe), and isolate affected endpoints immediately.",
+    "tags": ["cobalt-strike", "beacon", "c2", "powershell", "ioc"],
+    "severity": "Critical",
+    "published": "2025-02-20"
+  },
+  {
+    "id": "TI-002",
+    "title": "TOR Exit Node Abuse in Credential Theft Campaigns",
+    "source": "Microsoft Threat Intelligence",
+    "content": "Threat actors are increasingly using TOR exit nodes for credential-based attacks against Entra ID. In recent campaigns, attackers first harvest credentials via phishing (T1566.002), then authenticate through TOR to evade geographic-based conditional access policies. The IP range 185.220.101.0/24 has been associated with multiple campaigns targeting financial sector organizations. Key detection strategies: correlate sign-in logs with TOR exit node lists, flag any successful authentication from TOR that bypasses MFA, and cross-reference with phishing alerts within a 24-hour window. Risk indicators: sign-in from TOR + no MFA + outside business hours = high-confidence compromise.",
+    "tags": ["tor", "credential-theft", "entra-id", "phishing", "identity"],
+    "severity": "High",
+    "published": "2025-03-01"
+  },
+  {
+    "id": "TI-003",
+    "title": "Double Extortion Ransomware: LockBit 4.0 Variant TTPs",
+    "source": "Mandiant Intelligence Report M-TR-2025-0089",
+    "content": "LockBit 4.0 variants observed in Q1 2025 follow a consistent attack chain: initial access via phishing or exposed RDP, credential harvesting with Mimikatz or LSASS dump, lateral movement via PsExec or WMI, data exfiltration to cloud storage (commonly mega.nz, transfer.sh, or Backblaze B2), followed by file encryption using ChaCha20 with .locked extension. The ransomware binary typically spawns from a Cobalt Strike beacon payload. Dwell time averages 3-5 days. The ransom note references a TOR-based leak site. Key IOCs: file extension .locked, ransom note README_RESTORE.txt, process tree beacon.exe → locker.exe. Containment: isolate host, disable affected accounts, block exfil destinations, preserve forensic evidence before reimaging.",
+    "tags": ["ransomware", "lockbit", "double-extortion", "encryption", "exfiltration"],
+    "severity": "Critical",
+    "published": "2025-02-28"
+  },
+  {
+    "id": "TI-004",
+    "title": "PsExec Lateral Movement Detection",
+    "source": "MITRE ATT&CK Knowledge Base",
+    "content": "PsExec (T1570) enables remote command execution via SMB on port 445. Adversaries commonly use stolen domain admin credentials to move laterally from compromised workstations to domain controllers and file servers. Detection signatures: PSEXESVC.exe service installation on target, named pipe \\\\pipe\\\\psexesvc, SMB connections from workstation to server tier on port 445, and new service creation events (Event ID 7045). In enterprise environments, PsExec from a workstation to a domain controller is almost always malicious. Recommended hunting query: look for any workstation-tier host initiating SMB sessions to Tier 0 assets (DCs, ADFS, PKI). Response: disable compromised service accounts, reset krbtgt if DC accessed, review Group Policy for unauthorized changes.",
+    "tags": ["psexec", "lateral-movement", "smb", "domain-controller", "credential-theft"],
+    "severity": "High",
+    "published": "2025-01-15"
+  },
+  {
+    "id": "TI-005",
+    "title": "Phishing Typosquat Domain Patterns for M365 Credential Harvesting",
+    "source": "PhishLabs Quarterly Report Q1 2025",
+    "content": "Credential harvesting campaigns in Q1 2025 heavily leverage typosquat domains targeting Microsoft 365 tenants. Common patterns include replacing 'o' with '0' (contoso → contos0), adding hyphens (contoso-login.com), and using subdomains (login.contoso.attacker.com). The harvesting pages clone the Entra ID sign-in experience pixel-for-pixel, including dynamic background images and tenant branding. After credential capture, attackers immediately attempt sign-in (typically within 5 minutes) to establish persistence via app consent grants or inbox rules. Detection: monitor for newly registered domains similar to your tenant name, alert on successful authentication following email link clicks to unknown domains, and check for new inbox forwarding rules on compromised accounts.",
+    "tags": ["phishing", "typosquat", "credential-harvest", "m365", "social-engineering"],
+    "severity": "Medium",
+    "published": "2025-03-05"
+  }
+]

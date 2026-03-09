@@ -29,3 +29,6 @@ nul
 
 # Azure
 .azure/
+
+# Generated investigation outputs from notebooks
+data/investigation_*.json
