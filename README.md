@@ -10,7 +10,7 @@ This project uses **multi-agent architecture** to automate and enhance SOC workf
 - **RAG-powered agents** for threat intelligence search
 - **Stateful agents** with conversation persistence
 - **Router/worker patterns** for workload distribution
-- **Hierarchical teams** with task coordination
+- **Hierarchical teams** with handoff/groupchat/concurrent orchestration
 - **Guardrails & evaluation** for production safety
 
 All notebooks run against **Azure AI Search**, **Application Insights** tracing, and **mock/live threat data**.
@@ -42,6 +42,13 @@ cd agentic-soc-army
 
 # Install dependencies
 uv sync
+```
+
+If you use `pip`, make sure pre-release packages are allowed:
+
+```bash
+python -m pip install --upgrade pip
+pip install --pre -e .
 ```
 
 ### 2. Configure Infrastructure (Azure)
@@ -174,13 +181,15 @@ Or open directly in VS Code (native notebook integration).
 ### **Notebook 05: Hierarchical SOC Team (Microsoft Agent Framework)**
 **Goal:** Multi-level agent hierarchy for enterprise SOC  
 **Key Concepts:**
-- Team-based coordination (manager, specialists)
-- Hierarchical task decomposition
-- Microsoft Agent Framework (MAF) orchestration
+- Handoff escalation chain (Tier-1 -> Tier-2 -> Incident Commander)
+- GroupChat war-room collaboration (threat, IAM, endpoint specialists)
+- Concurrent parallel triage and timing comparison
+- Microsoft Agent Framework (MAF) orchestration patterns
 - Real-time tracing and observability
 - Application Insights integration
 
 **Requires:**
+- `agent-framework-core`, `agent-framework-azure-ai`, and `agent-framework-orchestrations` (pre-release packages)
 - `APPLICATIONINSIGHTS_CONNECTION_STRING` highly recommended for full tracing
 
 **Outputs:** `data/investigation_05.json`
